@@ -42,16 +42,37 @@ od;
 
 total := function(h)
     local name, s, t;
-    s := h.size;
+    if h.size < 100000 then
+        s := h.size;
+    else
+        s := 0;
+    fi;
     for name in  RecNames(h) do
         if IsRecord(h.(name)) then
-            t := total(h.(name));
-            if t < 100000 then
-                s := s + total(h.(name));
-            fi;
+            s := s + total(h.(name));
         fi;
     od;
     return s;
+end;
+
+find_large_enough_files := function(h, req, l)
+    local name;
+    if h.size > req then
+        Add(l, h);
+    fi;
+    for name in  RecNames(h) do
+        if IsRecord(h.(name)) then
+            find_large_enough_files(h.(name), req, l);
+        fi;
+    od;
+end;
+
+delete_size := function(h, req)
+    local l;
+    l := [];
+    find_large_enough_files(h, req, l);
+    Sort(l);
+    return l[1].size;
 end;
 
 tree := function(h, indent)
@@ -79,5 +100,7 @@ tree := function(h, indent)
     od;
 end;
 
-Print(total(hierarchy));
+Print(total(hierarchy), "\n");
 #tree(hierarchy, 0);
+
+Print(delete_size(hierarchy,  30000000 - (70000000 - hierarchy.size)));
