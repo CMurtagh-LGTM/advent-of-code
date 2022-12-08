@@ -44,49 +44,43 @@ total := Sum(Sum(visible));
 Print(total, "\n");
 
 scenic := 0;
+scenic_debug := List([1..99], x->EmptyPlist(99));
 
 for x in [1..99] do
     for y in [1..99] do
-        potential := 1;
-        a := 1;
-        for xi in [x..99] do
-            if trees[y][xi] < trees[y][x] then
-                a := a + 1;
-            else
+        a := 0;
+        for xi in [x+1..99] do
+            a := a + 1;
+            if trees[y][xi] >= trees[y][x] then
                 break;
             fi;
         od;
-        potential := potential * Maximum(a, 1);
-        a := 1;
-        for xi in [1..x] do
-            if trees[y][xi] < trees[y][x] then
-                a := a + 1;
-            else
+        b := 0;
+        for xi in [x-1, x-2..1] do
+            b := b + 1;
+            if trees[y][xi] >= trees[y][x] then
                 break;
             fi;
         od;
-        potential := potential * Maximum(a, 1);
-        a := 1;
-        for yi in [y..99] do
-            if trees[yi][x] < trees[y][x] then
-                a := a + 1;
-            else
+        c := 0;
+        for yi in [y+1..99] do
+            c := c + 1;
+            if trees[yi][x] >= trees[y][x] then
                 break;
             fi;
         od;
-        potential := potential * Maximum(a, 1);
-        a := 1;
-        for yi in [1..y] do
-            if trees[yi][x] < trees[y][x] then
-                a := a + 1;
-            else
+        d := 0;
+        for yi in [y-1, y-2..1] do
+            d := d + 1;
+            if trees[yi][x] >= trees[y][x] then
                 break;
             fi;
         od;
-        potential := potential * Maximum(a, 1);
+        potential := a * b * c * d;
+        scenic_debug[y][x] := potential;
         if potential > scenic then
+            Print(potential, ", ", scenic, " ", x , ",", y, "\n");
             scenic := potential;
-            Print(x, ", ", y, "\n");
         fi;
     od;
 od;
