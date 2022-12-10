@@ -8,8 +8,10 @@ knots := List([1..10], x->[0, 0]);
 
 visited := rec(("0,0") := 1);
 
-max := [0,0];
-min := [0,0];
+max := [224,16];
+min := [-29,-248];
+#max := [14,15];
+#min := [-11,-5];
 
 while(not IsEndOfStream(file_stream)) do
     line := Chomp(ReadLine(file_stream));
@@ -35,35 +37,30 @@ while(not IsEndOfStream(file_stream)) do
                 if i = 10 then
                     visited.(Concatenation(String(knots[10][1]), ",", String(knots[10][2]))) := 1;
                 fi;
-
-                if knots[i][1] > max[1] then
-                    max[1] := knots[i][1];
-                elif knots[i][1] < min[1] then
-                    min[1] := knots[i][1];
-                fi;
-                if knots[i][2] > max[2] then
-                    max[2] := knots[i][2];
-                elif knots[i][2] < min[2] then
-                    min[2] := knots[i][2];
+            od;
+        od;
+        
+        # display this move
+        disp := List([min[2]..max[2]], y->[]);
+        for x in [min[1]..max[1]] do
+            for y in [min[2]..max[2]] do
+                for i in [10,9..1] do
+                    if knots[i] = [x,y] then
+                        disp[y-min[2]+1][x-min[1]+1] := String(i-1)[1];
+                    fi;
+                od;
+                if not IsBound(disp[y-min[2]+1][x-min[1]+1]) then
+                    if IsBound(visited.(Concatenation(String(x), ",", String(y)))) then
+                        disp[y-min[2]+1][x-min[1]+1] := '#';
+                    else
+                        disp[y-min[2]+1][x-min[1]+1] := '.';
+                    fi;
                 fi;
             od;
         od;
-    fi;
-od;
 
-disp := List([min[1]..max[1]], x->[]);
-for x in [min[1]..max[1]] do
-    for y in [min[2]..max[2]] do
-        if IsBound(visited.(Concatenation(String(x), ",", String(y)))) then
-            if x = y and y = 0 then
-                disp[x-min[1]+1][y-min[2]+1] := 's';
-            else
-                disp[x-min[1]+1][y-min[2]+1] := '#';
-            fi;
-        else
-            disp[x-min[1]+1][y-min[2]+1] := '.';
-        fi;
-    od;
+        Print(JoinStringsWithSeparator(Reversed(disp), "\n"), "\n\n");
+    fi;
 od;
 
 score := Length(RecNames(visited));
